@@ -5,6 +5,27 @@ import Root from './containers/Root';
 import { configureStore, history } from './store/configureStore';
 import './app.global.css';
 
+const IPFSFactory = require('ipfsd-ctl')
+
+const port = 9090
+const server = IPFSFactory.createServer(port)
+const f = IPFSFactory.create({ remote: true, port: port })
+
+server.start((err) => {
+  if (err) { throw err }
+
+  f.spawn((err, ipfsd) => {
+    if (err) { throw err }
+
+    ipfsd.api.id(function (err, id) {
+      if (err) { throw err }
+
+      console.log(id)
+      ipfsd.stop(server.stop)
+    })
+  })
+})
+
 const store = configureStore();
 
 render(
